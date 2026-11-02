@@ -61,3 +61,9 @@ export async function login(req, res) {
 
   res.json({ user: publicUser(user), token: signToken(user) });
 }
+
+export async function me(req, res) {
+  const user = await prisma.user.findUnique({ where: { id: req.userId } });
+  if (!user) return res.status(404).json({ error: "User not found" });
+  res.json({ user: publicUser(user) });
+}
