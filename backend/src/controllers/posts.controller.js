@@ -6,7 +6,7 @@ const postSchema = z.object({
 });
 
 // only expose safe author fields, plus like/comment counts
-const postInclude = {
+export const postInclude = {
   author: { select: { id: true, username: true, name: true, avatar: true } },
   _count: { select: { likes: true, comments: true } },
 };

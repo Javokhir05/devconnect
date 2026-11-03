@@ -4,7 +4,7 @@ import "dotenv/config";
 import authRoutes from "./routes/auth.routes.js";
 import postRoutes from "./routes/posts.routes.js";
 import commentRoutes from "./routes/comments.routes.js";
-
+import userRoutes from "./routes/users.routes.js";
 
 const app = express();
 
@@ -15,6 +15,7 @@ app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/users", userRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`API running on port ${PORT}`));
