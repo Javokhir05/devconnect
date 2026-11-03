@@ -36,9 +36,11 @@ export async function createPost(req, res) {
 export async function getFeed(req, res) {
   const limit = Math.min(Number(req.query.limit) || 20, 50);
   const cursor = Number(req.query.cursor) || null;
+  const q = String(req.query.q || "").trim();
 
   const posts = await prisma.post.findMany({
-    take: limit + 1,
+  where: q ? { content: { contains: q, mode: "insensitive" } } : {},
+  take: limit + 1,
     ...(cursor && { cursor: { id: cursor }, skip: 1 }),
     orderBy: { id: "desc" },
     include: postInclude,
