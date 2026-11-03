@@ -5,11 +5,21 @@ const postSchema = z.object({
   content: z.string().trim().min(1, "Post cannot be empty").max(1000, "Post is too long (max 1000 characters)"),
 });
 
-// only expose safe author fields, plus like/comment counts
+// shared with users.controller.js
 export const postInclude = {
   author: { select: { id: true, username: true, name: true, avatar: true } },
   _count: { select: { likes: true, comments: true } },
 };
+
+// also fetch this viewer's own like (if logged in)
+const includeFor = (userId) => ({
+  ...postInclude,
+  likes: userId ? { where: { userId }, select: { userId: true } } : false,
+});
+
+function shape({ likes = [], ...post }) {
+  return { ...post, likedByMe: likes.length > 0 };
+}
 
 function parseId(req, res) {
   const id = Number(req.params.id);
@@ -27,36 +37,35 @@ export async function createPost(req, res) {
   }
   const post = await prisma.post.create({
     data: { content: parsed.data.content, authorId: req.userId },
-    include: postInclude,
+    include: includeFor(req.userId),
   });
-  res.status(201).json({ post });
+  res.status(201).json({ post: shape(post) });
 }
 
-// cursor pagination: GET /api/posts?limit=20&cursor=<lastPostId>
 export async function getFeed(req, res) {
   const limit = Math.min(Number(req.query.limit) || 20, 50);
   const cursor = Number(req.query.cursor) || null;
   const q = String(req.query.q || "").trim();
 
   const posts = await prisma.post.findMany({
-  where: q ? { content: { contains: q, mode: "insensitive" } } : {},
-  take: limit + 1,
+    where: q ? { content: { contains: q, mode: "insensitive" } } : {},
+    take: limit + 1,
     ...(cursor && { cursor: { id: cursor }, skip: 1 }),
     orderBy: { id: "desc" },
-    include: postInclude,
+    include: includeFor(req.userId),
   });
 
   const hasMore = posts.length > limit;
-  const items = hasMore ? posts.slice(0, limit) : posts;
+  const items = (hasMore ? posts.slice(0, limit) : posts).map(shape);
   res.json({ posts: items, nextCursor: hasMore ? items[items.length - 1].id : null });
 }
 
 export async function getPost(req, res) {
   const id = parseId(req, res);
   if (!id) return;
-  const post = await prisma.post.findUnique({ where: { id }, include: postInclude });
+  const post = await prisma.post.findUnique({ where: { id }, include: includeFor(req.userId) });
   if (!post) return res.status(404).json({ error: "Post not found" });
-  res.json({ post });
+  res.json({ post: shape(post) });
 }
 
 export async function updatePost(req, res) {
@@ -76,9 +85,9 @@ export async function updatePost(req, res) {
   const post = await prisma.post.update({
     where: { id },
     data: { content: parsed.data.content },
-    include: postInclude,
+    include: includeFor(req.userId),
   });
-  res.json({ post });
+  res.json({ post: shape(post) });
 }
 
 export async function deletePost(req, res) {
