@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function AppLayout() {
   const { user, logout } = useAuth();
@@ -18,7 +19,9 @@ export default function AppLayout() {
 
   const sideLink = ({ isActive }) =>
     `block rounded-lg px-3 py-2 text-sm ${
-      isActive ? "bg-accent-500/15 text-accent-400" : "text-slate-400 hover:text-white"
+      isActive
+        ? "bg-accent-500/15 text-accent-400"
+        : "text-slate-400 hover:text-white"
     }`;
 
   const tabLink = ({ isActive }) =>
@@ -29,7 +32,8 @@ export default function AppLayout() {
       {/* desktop sidebar */}
       <aside className="hidden w-56 shrink-0 flex-col border-r border-white/10 p-4 md:sticky md:top-0 md:flex md:h-screen">
         <h1 className="mb-6 text-lg font-bold text-white">
-          <span className="text-accent-400">$</span> <span className="cursor">devconnect</span>
+          <span className="text-accent-400">$</span>{" "}
+          <span className="cursor">devconnect</span>
         </h1>
         <nav className="flex-1 space-y-1">
           {items.map((i) => (
@@ -40,7 +44,11 @@ export default function AppLayout() {
         </nav>
         <div className="border-t border-white/10 pt-3 text-sm">
           <p className="truncate text-accent-400">@{user.username}</p>
-          <button onClick={handleLogout} className="mt-1 text-slate-400 hover:text-white">
+          <ThemeToggle className="mt-1 block" />
+          <button
+            onClick={handleLogout}
+            className="mt-1 block text-slate-400 hover:text-white"
+          >
             $ logout
           </button>
         </div>
@@ -50,11 +58,18 @@ export default function AppLayout() {
         {/* mobile top bar */}
         <header className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
           <h1 className="font-bold text-white">
-            <span className="text-accent-400">$</span> <span className="cursor">devconnect</span>
+            <span className="text-accent-400">$</span>{" "}
+            <span className="cursor">devconnect</span>
           </h1>
-          <button onClick={handleLogout} className="text-sm text-slate-400 hover:text-white">
-            logout
-          </button>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <button
+              onClick={handleLogout}
+              className="text-sm text-slate-400 hover:text-white"
+            >
+              logout
+            </button>
+          </div>
         </header>
 
         <main className="min-w-0 flex-1 p-4 pb-24 md:p-6">

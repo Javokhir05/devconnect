@@ -42,7 +42,7 @@ export default function Register() {
         {submitting ? "Creating account..." : "Sign up"}
       </button>
       <p className="text-center text-sm text-slate-400">
-        Already have an account? <Link to="/login" className="text-accent-400">Sign in</Link>
+        Already have an account? <Link to="/login" className="text-accent-400">Log in</Link>
       </p>
     </form>
   );
