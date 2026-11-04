@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { prisma } from "../lib/prisma.js";
-import { postInclude } from "./posts.controller.js";
+import { includeFor, shape } from "./posts.controller.js";
 
 const publicSelect = {
   id: true, username: true, name: true, bio: true, location: true,
@@ -72,16 +72,16 @@ export async function getUserPosts(req, res) {
   const limit = Math.min(Number(req.query.limit) || 20, 50);
   const cursor = Number(req.query.cursor) || null;
   const posts = await prisma.post.findMany({
-    where: { authorId: user.id },
-    take: limit + 1,
-    ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-    orderBy: { id: "desc" },
-    include: postInclude,
-  });
+  where: { authorId: user.id },
+  take: limit + 1,
+  ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+  orderBy: { id: "desc" },
+  include: includeFor(req.userId),
+});
 
-  const hasMore = posts.length > limit;
-  const items = hasMore ? posts.slice(0, limit) : posts;
-  res.json({ posts: items, nextCursor: hasMore ? items[items.length - 1].id : null });
+const hasMore = posts.length > limit;
+const items = (hasMore ? posts.slice(0, limit) : posts).map(shape);
+res.json({ posts: items, nextCursor: hasMore ? items[items.length - 1].id : null });
 }
 
 export async function updateMe(req, res) {

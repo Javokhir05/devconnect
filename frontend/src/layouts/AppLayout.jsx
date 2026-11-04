@@ -21,6 +21,7 @@ export default function AppLayout() {
         <h1 className="mb-6 text-lg font-bold text-white">{"</>"} DevConnect</h1>
         <nav className="flex-1 space-y-1">
           <NavLink to="/" end className={linkClass}>Home</NavLink>
+          <NavLink to={`/u/${user.username}`} className={linkClass}>Profile</NavLink>
         </nav>
         <div className="border-t border-white/10 pt-3 text-sm">
           <p className="text-white">@{user.username}</p>

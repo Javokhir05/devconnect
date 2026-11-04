@@ -8,7 +8,7 @@ const router = Router();
 router.get("/", searchUsers);
 router.patch("/me", requireAuth, updateMe);
 router.get("/:username", optionalAuth, getProfile);
-router.get("/:username/posts", getUserPosts);
+router.get("/:username/posts", optionalAuth, getUserPosts);
 router.put("/:username/follow", requireAuth, followUser);
 router.delete("/:username/follow", requireAuth, unfollowUser);
 

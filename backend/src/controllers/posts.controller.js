@@ -12,12 +12,12 @@ export const postInclude = {
 };
 
 // also fetch this viewer's own like (if logged in)
-const includeFor = (userId) => ({
+export const includeFor = (userId) => ({
   ...postInclude,
   likes: userId ? { where: { userId }, select: { userId: true } } : false,
 });
 
-function shape({ likes = [], ...post }) {
+export function shape({ likes = [], ...post }) {
   return { ...post, likedByMe: likes.length > 0 };
 }
 
