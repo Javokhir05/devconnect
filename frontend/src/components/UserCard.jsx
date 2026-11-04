@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import api, { errorMessage } from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import Avatar from "./Avatar";
 
 export default function UserCard({ user }) {
   const { user: me } = useAuth();
@@ -28,8 +29,8 @@ export default function UserCard({ user }) {
   return (
     <div className="flex flex-col items-center rounded-xl border border-white/10 bg-white/3 p-4 text-center">
       <Link to={`/u/${user.username}`} className="flex flex-col items-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-500/30 text-xl font-semibold uppercase text-white">
-          {user.username[0]}
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-500/30 text-xl font-semibold uppercase text-white">
+          <Avatar user={user} />
         </div>
         <p className="mt-2 font-medium text-white hover:underline">{user.name || user.username}</p>
         <p className="text-sm text-slate-500">@{user.username}</p>
@@ -48,7 +49,7 @@ export default function UserCard({ user }) {
           className={`mt-3 w-full rounded-lg px-3 py-1.5 text-sm font-medium disabled:opacity-50 ${
             isFollowing
               ? "border border-white/10 text-slate-200 hover:bg-white/5"
-              : "bg-indigo-500 text-white hover:bg-indigo-400"
+              : "bg-accent-500 text-white hover:bg-accent-400"
           }`}
         >
           {isFollowing ? "Following" : "Follow"}

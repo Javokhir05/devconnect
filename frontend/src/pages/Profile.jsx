@@ -3,9 +3,10 @@ import { useParams } from "react-router-dom";
 import api, { errorMessage } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
+import Avatar from "../components/Avatar";
 
 const input =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-indigo-500";
+  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-accent-500";
 
 function EditForm({ profile, onSaved, onCancel }) {
   const [form, setForm] = useState({
@@ -41,7 +42,7 @@ function EditForm({ profile, onSaved, onCancel }) {
       <input className={input} placeholder="GitHub URL (https://...)" value={form.githubUrl} onChange={update("githubUrl")} />
       <input className={input} placeholder="Portfolio URL (https://...)" value={form.portfolioUrl} onChange={update("portfolioUrl")} />
       <div className="flex gap-2">
-        <button disabled={saving} className="rounded-lg bg-indigo-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-400 disabled:opacity-50">
+        <button disabled={saving} className="rounded-lg bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-400 disabled:opacity-50">
           {saving ? "Saving..." : "Save"}
         </button>
         <button type="button" onClick={onCancel} className="rounded-lg border border-white/10 px-4 py-1.5 text-sm text-slate-300 hover:bg-white/5">
@@ -134,10 +135,10 @@ export default function Profile() {
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <section className="rounded-xl border border-white/10 bg-white/3 p-6">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-indigo-500/30 text-2xl font-semibold uppercase text-white">
-              {profile.username[0]}
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-accent-500/30 text-2xl font-semibold uppercase text-white">
+              <Avatar user={profile} size="lg" />
             </div>
             <div>
               <h2 className="text-xl font-semibold text-white">{profile.name || profile.username}</h2>
@@ -157,7 +158,7 @@ export default function Profile() {
               className={`rounded-lg px-4 py-1.5 text-sm font-medium disabled:opacity-50 ${
                 isFollowing
                   ? "border border-white/10 text-slate-200 hover:bg-white/5"
-                  : "bg-indigo-500 text-white hover:bg-indigo-400"
+                  : "bg-accent-500 text-white hover:bg-accent-400"
               }`}
             >
               {isFollowing ? "Following" : "Follow"}
@@ -175,12 +176,12 @@ export default function Profile() {
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-400">
               {profile.location && <span>📍 {profile.location}</span>}
               {profile.githubUrl && (
-                <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
+                <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="text-accent-400 hover:underline">
                   GitHub
                 </a>
               )}
               {profile.portfolioUrl && (
-                <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
+                <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="text-accent-400 hover:underline">
                   Portfolio
                 </a>
               )}

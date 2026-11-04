@@ -27,7 +27,7 @@ export default function Register() {
   };
 
   const input =
-    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-slate-500 outline-none focus:border-indigo-500";
+    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-slate-500 outline-none focus:border-accent-500";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-white/10 bg-white/3 p-6">
@@ -38,11 +38,11 @@ export default function Register() {
       <input className={input} type="password" placeholder="Password (min 8 characters)" value={form.password}
         onChange={update("password")} required minLength={8} />
       <button disabled={submitting}
-        className="w-full rounded-lg bg-indigo-500 py-2 font-medium text-white hover:bg-indigo-400 disabled:opacity-50">
+        className="w-full rounded-lg bg-accent-500 py-2 font-medium text-white hover:bg-accent-400 disabled:opacity-50">
         {submitting ? "Creating account..." : "Sign up"}
       </button>
       <p className="text-center text-sm text-slate-400">
-        Already have an account? <Link to="/login" className="text-indigo-400">Sign in</Link>
+        Already have an account? <Link to="/login" className="text-accent-400">Sign in</Link>
       </p>
     </form>
   );

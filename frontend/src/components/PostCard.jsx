@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { timeAgo } from "../utils/time";
 import CommentSection from "./CommentSection";
 import { Link } from "react-router-dom";
+import Avatar from "./Avatar";
 
 export default function PostCard({ post, onDelete }) {
   const { user } = useAuth();
@@ -50,7 +51,7 @@ export default function PostCard({ post, onDelete }) {
       <header className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/30 text-sm font-semibold uppercase text-white">
-            {post.author.username[0]}
+            <Avatar user={post.author} size="sm" />
           </div>
           <div className="text-sm">
             <Link

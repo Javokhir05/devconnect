@@ -83,11 +83,11 @@ export default function CommentSection({ postId, onCountChange }) {
           onChange={(e) => setContent(e.target.value)}
           maxLength={500}
           placeholder="Write a comment..."
-          className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder-slate-500 outline-none focus:border-indigo-500"
+          className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder-slate-500 outline-none focus:border-accent-500"
         />
         <button
           disabled={submitting || !content.trim()}
-          className="rounded-lg bg-indigo-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-400 disabled:opacity-50"
+          className="rounded-lg bg-accent-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-400 disabled:opacity-50"
         >
           Send
         </button>

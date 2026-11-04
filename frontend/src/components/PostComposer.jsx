@@ -37,7 +37,7 @@ export default function PostComposer({ onCreated }) {
         <span className="text-xs text-slate-500">{content.length}/1000</span>
         <button
           disabled={submitting || !content.trim()}
-          className="rounded-lg bg-indigo-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-400 disabled:opacity-50"
+          className="rounded-lg bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-400 disabled:opacity-50"
         >
           {submitting ? "Posting..." : "Post"}
         </button>

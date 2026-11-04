@@ -26,7 +26,7 @@ export default function Login() {
   };
 
   const input =
-    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-slate-500 outline-none focus:border-indigo-500";
+    "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-white placeholder-slate-500 outline-none focus:border-accent-500";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 rounded-xl border border-white/10 bg-white/3 p-6">
@@ -37,11 +37,11 @@ export default function Login() {
       <input className={input} type="password" placeholder="Password" value={password}
         onChange={(e) => setPassword(e.target.value)} required />
       <button disabled={submitting}
-        className="w-full rounded-lg bg-indigo-500 py-2 font-medium text-white hover:bg-indigo-400 disabled:opacity-50">
+        className="w-full rounded-lg bg-accent-500 py-2 font-medium text-white hover:bg-accent-400 disabled:opacity-50">
         {submitting ? "Signing in..." : "Sign in"}
       </button>
       <p className="text-center text-sm text-slate-400">
-        No account? <Link to="/register" className="text-indigo-400">Sign up</Link>
+        No account? <Link to="/register" className="text-accent-400">Sign up</Link>
       </p>
     </form>
   );

@@ -1,11 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const linkClass = ({ isActive }) =>
-  `block rounded-lg px-3 py-2 text-sm ${
-    isActive ? "bg-indigo-500/20 text-white" : "text-slate-400 hover:text-white"
-  }`;
-
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -15,25 +10,66 @@ export default function AppLayout() {
     navigate("/login");
   };
 
+  const items = [
+    { to: "/", label: "feed", end: true },
+    { to: "/explore", label: "explore" },
+    { to: `/u/${user.username}`, label: "profile" },
+  ];
+
+  const sideLink = ({ isActive }) =>
+    `block rounded-lg px-3 py-2 text-sm ${
+      isActive ? "bg-accent-500/15 text-accent-400" : "text-slate-400 hover:text-white"
+    }`;
+
+  const tabLink = ({ isActive }) =>
+    `flex-1 py-3 text-center text-xs ${isActive ? "text-accent-400" : "text-slate-500"}`;
+
   return (
-    <div className="flex min-h-screen bg-[#0B0B1E] text-slate-200">
-      <aside className="flex w-56 flex-col border-r border-white/10 p-4">
-        <h1 className="mb-6 text-lg font-bold text-white">{"</>"} DevConnect</h1>
+    <div className="min-h-screen bg-base text-slate-200 md:flex">
+      {/* desktop sidebar */}
+      <aside className="hidden w-56 shrink-0 flex-col border-r border-white/10 p-4 md:sticky md:top-0 md:flex md:h-screen">
+        <h1 className="mb-6 text-lg font-bold text-white">
+          <span className="text-accent-400">$</span> <span className="cursor">devconnect</span>
+        </h1>
         <nav className="flex-1 space-y-1">
-          <NavLink to="/" end className={linkClass}>Home</NavLink>
-          <NavLink to="/explore" className={linkClass}>Explore</NavLink>
-          <NavLink to={`/u/${user.username}`} className={linkClass}>Profile</NavLink>
+          {items.map((i) => (
+            <NavLink key={i.to} to={i.to} end={i.end} className={sideLink}>
+              {`> ${i.label}`}
+            </NavLink>
+          ))}
         </nav>
         <div className="border-t border-white/10 pt-3 text-sm">
-          <p className="text-white">@{user.username}</p>
+          <p className="truncate text-accent-400">@{user.username}</p>
           <button onClick={handleLogout} className="mt-1 text-slate-400 hover:text-white">
-            Log out
+            $ logout
           </button>
         </div>
       </aside>
-      <main className="flex-1 p-6">
-        <Outlet />
-      </main>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* mobile top bar */}
+        <header className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
+          <h1 className="font-bold text-white">
+            <span className="text-accent-400">$</span> <span className="cursor">devconnect</span>
+          </h1>
+          <button onClick={handleLogout} className="text-sm text-slate-400 hover:text-white">
+            logout
+          </button>
+        </header>
+
+        <main className="min-w-0 flex-1 p-4 pb-24 md:p-6">
+          <Outlet />
+        </main>
+      </div>
+
+      {/* mobile bottom tab bar */}
+      <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-white/10 bg-base pb-[env(safe-area-inset-bottom)] md:hidden">
+        {items.map((i) => (
+          <NavLink key={i.to} to={i.to} end={i.end} className={tabLink}>
+            {i.label}
+          </NavLink>
+        ))}
+      </nav>
     </div>
   );
 }

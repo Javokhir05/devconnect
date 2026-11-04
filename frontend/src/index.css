@@ -1,1 +1,49 @@
 @import "tailwindcss";
+@import "@fontsource-variable/jetbrains-mono";
+
+:root {
+  --font-sans: "JetBrains Mono Variable", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --color-base: #0B0B1E;
+  --color-accent-400: #7af0ac;
+  --color-accent-500: #3ddc84;
+
+  /* sharp, terminal-like corners */
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.25rem;
+}
+
+html,
+body {
+  background: var(--color-base);
+}
+
+::selection {
+  background: var(--color-accent-500);
+  color: var(--color-base);
+}
+
+/* filled green buttons get dark text, since white on bright green is hard to read */
+.bg-accent-500 {
+  color: #ffffff;
+}
+
+/* blinking terminal cursor after an element's text */
+.cursor::after {
+  content: "▍";
+  margin-left: 2px;
+  color: var(--color-accent-500);
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor::after {
+    animation: none;
+  }
+}
