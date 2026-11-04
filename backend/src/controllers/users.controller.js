@@ -34,11 +34,21 @@ export async function searchUsers(req, res) {
     take: limit + 1,
     ...(cursor && { cursor: { id: cursor }, skip: 1 }),
     orderBy: { id: "desc" },
-    select: { ...publicSelect, _count: { select: { followers: true } } },
+    select: {
+      ...publicSelect,
+      _count: { select: { followers: true } },
+      // this viewer's own follow row, if logged in
+      followers: req.userId
+        ? { where: { followerId: req.userId }, select: { followerId: true } }
+        : false,
+    },
   });
 
   const hasMore = users.length > limit;
-  const items = hasMore ? users.slice(0, limit) : users;
+  const items = (hasMore ? users.slice(0, limit) : users).map(({ followers = [], ...u }) => ({
+    ...u,
+    isFollowing: followers.length > 0,
+  }));
   res.json({ users: items, nextCursor: hasMore ? items[items.length - 1].id : null });
 }
 

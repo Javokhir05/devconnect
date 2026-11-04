@@ -5,7 +5,7 @@ import {
 import { requireAuth, optionalAuth } from "../middleware/auth.js";
 
 const router = Router();
-router.get("/", searchUsers);
+router.get("/",optionalAuth, searchUsers);
 router.patch("/me", requireAuth, updateMe);
 router.get("/:username", optionalAuth, getProfile);
 router.get("/:username/posts", optionalAuth, getUserPosts);

@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
+import Explore from "./pages/Explore"
 
 export default function App() {
   return (
@@ -16,8 +17,9 @@ export default function App() {
       </Route>
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Feed />} />
+          <Route path="/" element={<Feed />} /> 
           <Route path="/u/:username" element={<Profile />} />
+          <Route path="/explore" element={<Explore />} />
         </Route>
       </Route>
     </Routes>
