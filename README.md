@@ -4,7 +4,7 @@ A social platform for developers: share posts, follow people, and showcase your 
 
 **Live demo:** _coming soon_ · **Status:** Phase 1 complete, Phase 2 in planning
 
-![Landing page](docs/screenshots/landing.png)
+![Landing page](docs/screenshots/Landing.png)
 
 ## Features
 
