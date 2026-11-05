@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import api, { errorMessage } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
+import SkillTags from "./SkillTags";
 
 export default function UserCard({ user }) {
   const { user: me } = useAuth();
@@ -38,6 +39,7 @@ export default function UserCard({ user }) {
 
       {user.bio && <p className="mt-2 line-clamp-2 text-sm text-slate-400">{user.bio}</p>}
       {user.location && <p className="mt-1 text-xs text-slate-500">📍 {user.location}</p>}
+      <SkillTags skills={user.skills} className="justify-center" />
       <p className="mt-2 text-xs text-slate-500">
         {followers} {followers === 1 ? "follower" : "followers"}
       </p>

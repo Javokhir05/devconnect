@@ -4,6 +4,7 @@ import api, { errorMessage } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
+import SkillTags from "../components/SkillTags";
 
 const input =
   "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-accent-500";
@@ -15,6 +16,7 @@ function EditForm({ profile, onSaved, onCancel }) {
     location: profile.location || "",
     githubUrl: profile.githubUrl || "",
     portfolioUrl: profile.portfolioUrl || "",
+    skills: (profile.skills || []).join(", "),
   });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -25,8 +27,18 @@ function EditForm({ profile, onSaved, onCancel }) {
     setError("");
     setSaving(true);
     try {
-      const res = await api.patch("/users/me", form);
-      onSaved(res.data.user);
+      const skills = form.skills.split(",").map((s) => s.trim()).filter(Boolean);
+      const [p, s] = await Promise.all([
+        api.patch("/users/me", {
+          name: form.name,
+          bio: form.bio,
+          location: form.location,
+          githubUrl: form.githubUrl,
+          portfolioUrl: form.portfolioUrl,
+        }),
+        api.put("/users/me/skills", { skills }),
+      ]);
+      onSaved({ ...p.data.user, skills: s.data.skills });
     } catch (err) {
       setError(errorMessage(err));
       setSaving(false);
@@ -39,6 +51,7 @@ function EditForm({ profile, onSaved, onCancel }) {
       <input className={input} placeholder="Name" maxLength={60} value={form.name} onChange={update("name")} />
       <textarea className={input} rows={3} placeholder="Bio" maxLength={300} value={form.bio} onChange={update("bio")} />
       <input className={input} placeholder="Location" maxLength={60} value={form.location} onChange={update("location")} />
+      <input className={input} placeholder="Skills, separated by commas (React, Node.js, SQL)" value={form.skills} onChange={update("skills")} />
       <input className={input} placeholder="GitHub URL (https://...)" value={form.githubUrl} onChange={update("githubUrl")} />
       <input className={input} placeholder="Portfolio URL (https://...)" value={form.portfolioUrl} onChange={update("portfolioUrl")} />
       <div className="flex gap-2">
@@ -174,6 +187,7 @@ export default function Profile() {
           <div className="mt-4 space-y-2 text-sm">
             {profile.bio && <p className="whitespace-pre-wrap text-slate-300">{profile.bio}</p>}
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-400">
+              <SkillTags skills={profile.skills} />
               {profile.location && <span>📍 {profile.location}</span>}
               {profile.githubUrl && (
                 <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="text-accent-400 hover:underline">

@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.routes.js";
 import postRoutes from "./routes/posts.routes.js";
 import commentRoutes from "./routes/comments.routes.js";
 import userRoutes from "./routes/users.routes.js";
+import skillRoutes from "./routes/skills.routes.js";
 
 const app = express();
 
@@ -16,6 +17,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/skills", skillRoutes);
+
 
 app.use((req, res) => res.status(404).json({ error: "Route not found" }));
 
