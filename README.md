@@ -96,10 +96,6 @@ devconnect/
 - [ ] Phase 2: real-time chat (Socket.IO), notifications, image uploads, GitHub integration
 - [ ] Phase 3: job board, admin dashboard, project showcase
 
-## What I learned
-
-_Write 3 or 4 honest lines here in your own words._
-
 ## Author
 
-[Your name] · [GitHub profile link] · [LinkedIn or email]
+[Javokhirbek Ruziboev] · [https://github.com/Javokhir05] · [roziboyevjavokhir045@gmail.com]
