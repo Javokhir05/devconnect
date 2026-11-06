@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import api, { errorMessage } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
-import Avatar from "../components/Avatar";
 import SkillTags from "../components/SkillTags";
+import Avatar from "../components/Avatar";
+import { field } from "../utils/ui";
 
-const input =
-  "w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:border-accent-500";
+const TABS = ["posts", "about", "skills"];
+
+const cleanUrl = (url) => url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
 function EditForm({ profile, onSaved, onCancel }) {
   const [form, setForm] = useState({
@@ -46,14 +48,22 @@ function EditForm({ profile, onSaved, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      {error && <p className="rounded-lg bg-red-500/10 p-2 text-sm text-red-400">{error}</p>}
-      <input className={input} placeholder="Name" maxLength={60} value={form.name} onChange={update("name")} />
-      <textarea className={input} rows={3} placeholder="Bio" maxLength={300} value={form.bio} onChange={update("bio")} />
-      <input className={input} placeholder="Location" maxLength={60} value={form.location} onChange={update("location")} />
-      <input className={input} placeholder="Skills, separated by commas (React, Node.js, SQL)" value={form.skills} onChange={update("skills")} />
-      <input className={input} placeholder="GitHub URL (https://...)" value={form.githubUrl} onChange={update("githubUrl")} />
-      <input className={input} placeholder="Portfolio URL (https://...)" value={form.portfolioUrl} onChange={update("portfolioUrl")} />
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:p-6"
+    >
+      <h3 className="text-sm text-accent-400">$ edit-profile</h3>
+      {error && (
+        <p role="alert" className="rounded-lg bg-red-500/10 p-2 text-sm text-red-400">
+          {error}
+        </p>
+      )}
+      <input className={field} aria-label="Name" placeholder="Name" maxLength={60} value={form.name} onChange={update("name")} />
+      <textarea className={field} aria-label="Bio" rows={3} placeholder="Bio" maxLength={300} value={form.bio} onChange={update("bio")} />
+      <input className={field} aria-label="Location" placeholder="Location" maxLength={60} value={form.location} onChange={update("location")} />
+      <input className={field} aria-label="Skills" placeholder="Skills, separated by commas (React, Node.js, SQL)" value={form.skills} onChange={update("skills")} />
+      <input className={field} aria-label="GitHub URL" placeholder="GitHub URL (https://...)" value={form.githubUrl} onChange={update("githubUrl")} />
+      <input className={field} aria-label="Portfolio URL" placeholder="Portfolio URL (https://...)" value={form.portfolioUrl} onChange={update("portfolioUrl")} />
       <div className="flex gap-2">
         <button disabled={saving} className="rounded-lg bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-400 disabled:opacity-50">
           {saving ? "Saving..." : "Save"}
@@ -68,6 +78,7 @@ function EditForm({ profile, onSaved, onCancel }) {
 
 export default function Profile() {
   const { username } = useParams();
+  const [params, setParams] = useSearchParams();
   const { user: me, updateUser } = useAuth();
   const [profile, setProfile] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -79,6 +90,9 @@ export default function Profile() {
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  const tab = TABS.includes(params.get("tab")) ? params.get("tab") : "posts";
+  const selectTab = (t) => setParams(t === "posts" ? {} : { tab: t }, { replace: true });
 
   useEffect(() => {
     setLoading(true);
@@ -139,98 +153,196 @@ export default function Profile() {
   if (!profile) return <p className="text-red-400">{error}</p>;
 
   const isMe = me.username === profile.username;
+  const joined = new Date(profile.createdAt).toLocaleDateString(undefined, {
+    month: "long",
+    year: "numeric",
+  });
   const stats = [
     ["Posts", profile._count.posts],
     ["Followers", profile._count.followers],
     ["Following", profile._count.following],
   ];
+  const card = "rounded-xl border border-white/10 bg-white/[0.03]";
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      <section className="rounded-xl border border-white/10 bg-white/3 p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-accent-500/30 text-2xl font-semibold uppercase text-white">
-              <Avatar user={profile} size="lg" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-white">{profile.name || profile.username}</h2>
-              <p className="text-sm text-slate-500">@{profile.username}</p>
-            </div>
-          </div>
-          {isMe ? (
-            !editing && (
-              <button onClick={() => setEditing(true)} className="rounded-lg border border-white/10 px-4 py-1.5 text-sm text-slate-200 hover:bg-white/5">
-                Edit profile
-              </button>
-            )
-          ) : (
-            <button
-              onClick={toggleFollow}
-              disabled={busy}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium disabled:opacity-50 ${
-                isFollowing
-                  ? "border border-white/10 text-slate-200 hover:bg-white/5"
-                  : "bg-accent-500 text-white hover:bg-accent-400"
-              }`}
-            >
-              {isFollowing ? "Following" : "Follow"}
-            </button>
-          )}
+      {/* header */}
+      <section className={`${card} overflow-hidden`}>
+        <div aria-hidden="true" className="relative h-24 border-b border-white/10 sm:h-32">
+          <div className="grid-bg absolute inset-0" />
+          <div className="hero-glow absolute inset-0" />
+          <span className="absolute bottom-2 right-3 text-xs text-slate-500">
+            ~/{profile.username}
+          </span>
         </div>
 
-        {editing ? (
-          <div className="mt-4">
-            <EditForm profile={profile} onSaved={handleSaved} onCancel={() => setEditing(false)} />
-          </div>
-        ) : (
-          <div className="mt-4 space-y-2 text-sm">
-            {profile.bio && <p className="whitespace-pre-wrap text-slate-300">{profile.bio}</p>}
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-400">
-              <SkillTags skills={profile.skills} />
-              {profile.location && <span>📍 {profile.location}</span>}
-              {profile.githubUrl && (
-                <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="text-accent-400 hover:underline">
-                  GitHub
-                </a>
-              )}
-              {profile.portfolioUrl && (
-                <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="text-accent-400 hover:underline">
-                  Portfolio
-                </a>
+        <div className="px-4 pb-4 sm:px-6">
+          <div className="-mt-10 flex items-end justify-between gap-3">
+            <div className="rounded-full bg-base p-1">
+              <Avatar user={profile} size="lg" />
+            </div>
+            <div className="pb-1">
+              {isMe ? (
+                !editing && (
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="rounded-lg border border-white/10 px-4 py-1.5 text-sm text-slate-200 hover:bg-white/5"
+                  >
+                    Edit profile
+                  </button>
+                )
+              ) : (
+                <button
+                  onClick={toggleFollow}
+                  disabled={busy}
+                  className={`rounded-lg px-4 py-1.5 text-sm font-medium disabled:opacity-50 ${
+                    isFollowing
+                      ? "border border-white/10 text-slate-200 hover:bg-white/5"
+                      : "bg-accent-500 text-white hover:bg-accent-400"
+                  }`}
+                >
+                  {isFollowing ? "Following" : "Follow"}
+                </button>
               )}
             </div>
           </div>
-        )}
 
-        <div className="mt-4 flex gap-6 border-t border-white/10 pt-4 text-sm">
-          {stats.map(([label, value]) => (
-            <div key={label}>
-              <span className="font-semibold text-white">{value}</span>{" "}
-              <span className="text-slate-400">{label}</span>
-            </div>
-          ))}
+          <h2 className="mt-3 break-words text-xl font-semibold text-white">
+            {profile.name || profile.username}
+          </h2>
+          <p className="text-sm text-slate-500">@{profile.username}</p>
+          {profile.bio && (
+            <p className="mt-3 line-clamp-2 whitespace-pre-wrap break-words text-sm text-slate-300">
+              {profile.bio}
+            </p>
+          )}
+
+          <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-white/10 pt-4 text-sm">
+            {stats.map(([label, value]) => (
+              <div key={label}>
+                <span className="font-semibold text-white">{value}</span>{" "}
+                <span className="text-slate-400">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {error && <p className="rounded-lg bg-red-500/10 p-2 text-sm text-red-400">{error}</p>}
-      {posts.length === 0 && <p className="text-slate-400">No posts yet.</p>}
+      {error && (
+        <p role="alert" className="rounded-lg bg-red-500/10 p-2 text-sm text-red-400">
+          {error}
+        </p>
+      )}
 
-      {posts.map((post) => (
-        <PostCard
-          key={post.id}
-          post={post}
-          onDelete={(id) => {
-            setPosts((prev) => prev.filter((p) => p.id !== id));
-            setProfile((p) => ({ ...p, _count: { ...p._count, posts: p._count.posts - 1 } }));
-          }}
-        />
-      ))}
+      {editing ? (
+        <EditForm profile={profile} onSaved={handleSaved} onCancel={() => setEditing(false)} />
+      ) : (
+        <>
+          {/* tabs */}
+          <div role="tablist" aria-label="Profile sections" className="flex gap-1 border-b border-white/10">
+            {TABS.map((t) => (
+              <button
+                key={t}
+                role="tab"
+                id={`tab-${t}`}
+                aria-selected={tab === t}
+                aria-controls="tabpanel"
+                onClick={() => selectTab(t)}
+                className={`-mb-px border-b-2 px-4 py-2 text-sm ${
+                  tab === t
+                    ? "border-accent-500 text-accent-400"
+                    : "border-transparent text-slate-400 hover:text-white"
+                }`}
+              >
+                {t}
+                {t === "posts" && (
+                  <span className="ml-1.5 text-xs text-slate-500">{profile._count.posts}</span>
+                )}
+              </button>
+            ))}
+          </div>
 
-      {nextCursor && (
-        <button onClick={loadMore} disabled={loadingMore} className="w-full rounded-lg border border-white/10 py-2 text-sm text-slate-300 hover:bg-white/5 disabled:opacity-50">
-          {loadingMore ? "Loading..." : "Load more"}
-        </button>
+          <div role="tabpanel" id="tabpanel" aria-labelledby={`tab-${tab}`} className="space-y-4">
+            {tab === "posts" && (
+              <>
+                {posts.length === 0 && <p className="text-slate-400">No posts yet.</p>}
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onDelete={(id) => {
+                      setPosts((prev) => prev.filter((p) => p.id !== id));
+                      setProfile((p) => ({
+                        ...p,
+                        _count: { ...p._count, posts: p._count.posts - 1 },
+                      }));
+                    }}
+                  />
+                ))}
+                {nextCursor && (
+                  <button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="w-full rounded-lg border border-white/10 py-2 text-sm text-slate-300 hover:bg-white/5 disabled:opacity-50"
+                  >
+                    {loadingMore ? "Loading..." : "Load more"}
+                  </button>
+                )}
+              </>
+            )}
+
+            {tab === "about" && (
+              <div className={`${card} space-y-4 p-5 text-sm`}>
+                <p className="whitespace-pre-wrap break-words text-slate-300">
+                  {profile.bio || <span className="text-slate-500">No bio yet.</span>}
+                </p>
+                <dl className="grid grid-cols-[7rem_minmax(0,1fr)] gap-x-3 gap-y-2">
+                  <dt className="text-slate-500">location</dt>
+                  <dd className="break-words text-slate-300">{profile.location || "—"}</dd>
+                  <dt className="text-slate-500">joined</dt>
+                  <dd className="text-slate-300">{joined}</dd>
+                  <dt className="text-slate-500">github</dt>
+                  <dd>
+                    {profile.githubUrl ? (
+                      <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="break-all text-accent-400 hover:underline">
+                        {cleanUrl(profile.githubUrl)}
+                      </a>
+                    ) : (
+                      <span className="text-slate-300">—</span>
+                    )}
+                  </dd>
+                  <dt className="text-slate-500">portfolio</dt>
+                  <dd>
+                    {profile.portfolioUrl ? (
+                      <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="break-all text-accent-400 hover:underline">
+                        {cleanUrl(profile.portfolioUrl)}
+                      </a>
+                    ) : (
+                      <span className="text-slate-300">—</span>
+                    )}
+                  </dd>
+                </dl>
+              </div>
+            )}
+
+            {tab === "skills" && (
+              <div className={`${card} p-5`}>
+                {profile.skills?.length ? (
+                  <SkillTags skills={profile.skills} />
+                ) : (
+                  <p className="text-sm text-slate-400">
+                    No skills added yet.{" "}
+                    {isMe && (
+                      <button onClick={() => setEditing(true)} className="text-accent-400 hover:underline">
+                        Add some
+                      </button>
+                    )}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
