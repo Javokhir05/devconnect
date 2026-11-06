@@ -22,8 +22,14 @@ export default function PostComposer({ onCreated }) {
     }
   };
 
+  const insertCode = () =>
+    setContent((c) => (c && !c.endsWith("\n") ? c + "\n" : c) + "```\n\n```");
+
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-white/10 bg-white/3 p-4">
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-xl border border-white/10 bg-white/3 p-4"
+    >
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -33,8 +39,17 @@ export default function PostComposer({ onCreated }) {
         className="w-full resize-none bg-transparent text-white placeholder-slate-500 outline-none"
       />
       {error && <p className="mb-2 text-sm text-red-400">{error}</p>}
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-slate-500">{content.length}/1000</span>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={insertCode}
+            className="rounded border border-white/10 px-2 py-1 text-xs text-slate-300 hover:bg-white/5"
+          >
+            {"</> code"}
+          </button>
+          <span className="text-xs text-slate-500">{content.length}/1000</span>
+        </div>
         <button
           disabled={submitting || !content.trim()}
           className="rounded-lg bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-400 disabled:opacity-50"

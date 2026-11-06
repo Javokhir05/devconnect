@@ -8,6 +8,7 @@ import Register from "./pages/Register";
 import Feed from "./pages/Feed";
 import Explore from "./pages/Explore";
 import Profile from "./pages/Profile";
+import PostPage from "./pages/PostPage";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/feed" element={<Feed />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/u/:username" element={<Profile />} />
+          <Route path="/post/:id" element={<PostPage />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

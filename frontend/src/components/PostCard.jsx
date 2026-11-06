@@ -5,13 +5,19 @@ import { timeAgo } from "../utils/time";
 import CommentSection from "./CommentSection";
 import { Link } from "react-router-dom";
 import Avatar from "./Avatar";
+import PostContent from "./PostContent";
 
-export default function PostCard({ post, onDelete }) {
+export default function PostCard({
+  post,
+  onDelete,
+  defaultOpenComments = false,
+}) {
   const { user } = useAuth();
   const [liked, setLiked] = useState(post.likedByMe);
   const [likes, setLikes] = useState(post._count.likes);
   const [busy, setBusy] = useState(false);
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(defaultOpenComments);
+  const [copied, setCopied] = useState(false);
   const [commentCount, setCommentCount] = useState(post._count.comments);
   const isOwner = user.id === post.author.id;
 
@@ -46,6 +52,17 @@ export default function PostCard({ post, onDelete }) {
     }
   };
 
+  const share = async () => {
+    const url = `${window.location.origin}/post/${post.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      window.prompt("Copy this link:", url);
+    }
+  };
+
   return (
     <article className="rounded-xl border border-white/10 bg-white/3 p-4">
       <header className="mb-2 flex items-center justify-between">
@@ -75,9 +92,7 @@ export default function PostCard({ post, onDelete }) {
         )}
       </header>
 
-      <p className="whitespace-pre-wrap wrap-break-word text-slate-200">
-        {post.content}
-      </p>
+      <PostContent text={post.content} />
 
       <footer className="mt-3 flex gap-6 text-sm text-slate-400">
         <button
@@ -91,6 +106,9 @@ export default function PostCard({ post, onDelete }) {
           className={showComments ? "text-white" : "hover:text-white"}
         >
           💬 {commentCount}
+        </button>
+        <button onClick={share} className="hover:text-white">
+          {copied ? "✓ copied" : "↗ share"}
         </button>
       </footer>
 
