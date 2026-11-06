@@ -6,6 +6,7 @@ import { includeFor, shape } from "./posts.controller.js";
 const publicSelect = {
   id: true, username: true, name: true, bio: true, location: true,
   avatar: true, githubUrl: true, portfolioUrl: true, createdAt: true,
+  headline: true,
 };
 
 // Skills schema
@@ -40,6 +41,7 @@ const profileSchema = z.object({
   name: text(60),
   bio: text(300),
   location: text(60),
+  headline: text(60),
   githubUrl: link,
   portfolioUrl: link,
 });
@@ -47,16 +49,29 @@ const profileSchema = z.object({
 // GET /users/search?q=...&limit=...&cursor=...
 export async function searchUsers(req, res) {
   const q = String(req.query.q || "").trim();
+  const skill = String(req.query.skill || "").trim();
   const limit = Math.min(Number(req.query.limit) || 20, 50);
   const cursor = Number(req.query.cursor) || null;
 
+  const filters = [];
+  if (q) {
+    filters.push({
+      OR: [
+        { username: { contains: q, mode: "insensitive" } },
+        { name: { contains: q, mode: "insensitive" } },
+        { headline: { contains: q, mode: "insensitive" } },
+        { skills: { some: { skill: { name: { contains: q, mode: "insensitive" } } } } },
+      ],
+    });
+  }
+  if (skill) {
+    filters.push({
+      skills: { some: { skill: { name: { equals: skill, mode: "insensitive" } } } },
+    });
+  }
+
   const users = await prisma.user.findMany({
-    where: q
-      ? { OR: [
-          { username: { contains: q, mode: "insensitive" } },
-          { name: { contains: q, mode: "insensitive" } },
-        ] }
-      : {},
+    where: { AND: filters },
     take: limit + 1,
     ...(cursor && { cursor: { id: cursor }, skip: 1 }),
     orderBy: { id: "desc" },

@@ -15,6 +15,7 @@ function EditForm({ profile, onSaved, onCancel }) {
   const [form, setForm] = useState({
     name: profile.name || "",
     bio: profile.bio || "",
+    headline: profile.headline || "",
     location: profile.location || "",
     githubUrl: profile.githubUrl || "",
     portfolioUrl: profile.portfolioUrl || "",
@@ -34,6 +35,7 @@ function EditForm({ profile, onSaved, onCancel }) {
         api.patch("/users/me", {
           name: form.name,
           bio: form.bio,
+          headline: form.headline,
           location: form.location,
           githubUrl: form.githubUrl,
           portfolioUrl: form.portfolioUrl,
@@ -59,6 +61,7 @@ function EditForm({ profile, onSaved, onCancel }) {
         </p>
       )}
       <input className={field} aria-label="Name" placeholder="Name" maxLength={60} value={form.name} onChange={update("name")} />
+      <input className={field} aria-label="Headline" placeholder="Headline (e.g. Frontend Developer)" maxLength={60} value={form.headline} onChange={update("headline")} />
       <textarea className={field} aria-label="Bio" rows={3} placeholder="Bio" maxLength={300} value={form.bio} onChange={update("bio")} />
       <input className={field} aria-label="Location" placeholder="Location" maxLength={60} value={form.location} onChange={update("location")} />
       <input className={field} aria-label="Skills" placeholder="Skills, separated by commas (React, Node.js, SQL)" value={form.skills} onChange={update("skills")} />
@@ -211,6 +214,7 @@ export default function Profile() {
             {profile.name || profile.username}
           </h2>
           <p className="text-sm text-slate-500">@{profile.username}</p>
+          {profile.headline && <p className="mt-1 text-sm text-accent-400">{profile.headline}</p>}
           {profile.bio && (
             <p className="mt-3 line-clamp-2 whitespace-pre-wrap break-words text-sm text-slate-300">
               {profile.bio}

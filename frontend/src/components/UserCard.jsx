@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
 import SkillTags from "./SkillTags";
 
-export default function UserCard({ user }) {
+export default function UserCard({ user, onSkillClick, activeSkill }) {
   const { user: me } = useAuth();
   const [isFollowing, setIsFollowing] = useState(user.isFollowing);
   const [followers, setFollowers] = useState(user._count.followers);
@@ -33,13 +33,28 @@ export default function UserCard({ user }) {
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-500/30 text-xl font-semibold uppercase text-white">
           <Avatar user={user} />
         </div>
-        <p className="mt-2 font-medium text-white hover:underline">{user.name || user.username}</p>
+        <p className="mt-2 font-medium text-white hover:underline">
+          {user.name || user.username}
+        </p>
         <p className="text-sm text-slate-500">@{user.username}</p>
       </Link>
 
-      {user.bio && <p className="mt-2 line-clamp-2 text-sm text-slate-400">{user.bio}</p>}
-      {user.location && <p className="mt-1 text-xs text-slate-500">📍 {user.location}</p>}
-      <SkillTags skills={user.skills} className="justify-center" />
+      {user.headline && (
+        <p className="mt-1 text-xs text-accent-400">{user.headline}</p>
+      )}
+      {user.bio && (
+        <p className="mt-2 line-clamp-2 text-sm text-slate-400">{user.bio}</p>
+      )}
+      {user.location && (
+        <p className="mt-1 text-xs text-slate-500">📍 {user.location}</p>
+      )}
+      <SkillTags
+        skills={user.skills}
+        className="justify-center"
+        onSelect={onSkillClick}
+        active={activeSkill}
+      />
+      
       <p className="mt-2 text-xs text-slate-500">
         {followers} {followers === 1 ? "follower" : "followers"}
       </p>
