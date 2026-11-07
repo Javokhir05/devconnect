@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { field } from "../utils/ui";
 
 export default function PasswordInput({ id, value, onChange, placeholder, autoComplete, minLength }) {
@@ -15,15 +16,15 @@ export default function PasswordInput({ id, value, onChange, placeholder, autoCo
         autoComplete={autoComplete}
         minLength={minLength}
         required
-        className={`${field} pr-16`}
+        className={`${field} pr-10`}
       />
       <button
         type="button"
         onClick={() => setShow((s) => !s)}
         aria-label={show ? "Hide password" : "Show password"}
-        className="absolute inset-y-0 right-3 text-xs text-slate-400 hover:text-white"
+        className="absolute inset-y-0 right-3 text-slate-400 hover:text-white"
       >
-        {show ? "hide" : "show"}
+        {show ? <EyeOff size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
       </button>
     </div>
   );

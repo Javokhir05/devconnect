@@ -4,6 +4,7 @@ import api, { errorMessage } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
 import SkillTags from "./SkillTags";
+import { MapPin } from "lucide-react";
 
 export default function UserCard({ user, onSkillClick, activeSkill }) {
   const { user: me } = useAuth();
@@ -46,7 +47,10 @@ export default function UserCard({ user, onSkillClick, activeSkill }) {
         <p className="mt-2 line-clamp-2 text-sm text-slate-400">{user.bio}</p>
       )}
       {user.location && (
-        <p className="mt-1 text-xs text-slate-500">📍 {user.location}</p>
+        <p className="mt-1 flex items-center justify-center gap-1 text-xs text-slate-500">
+          <MapPin size={12} aria-hidden="true" />
+          {user.location}
+        </p>
       )}
       <SkillTags
         skills={user.skills}
@@ -54,7 +58,7 @@ export default function UserCard({ user, onSkillClick, activeSkill }) {
         onSelect={onSkillClick}
         active={activeSkill}
       />
-      
+
       <p className="mt-2 text-xs text-slate-500">
         {followers} {followers === 1 ? "follower" : "followers"}
       </p>

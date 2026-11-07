@@ -3,6 +3,7 @@ import api, { errorMessage } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { timeAgo } from "../utils/time";
 import PostContent from "./PostContent";
+import { Code, Trash2 } from "lucide-react";
 
 export default function CommentSection({ postId, onCountChange }) {
   const { user } = useAuth();
@@ -75,9 +76,11 @@ export default function CommentSection({ postId, onCountChange }) {
             {c.user.id === user.id && (
               <button
                 onClick={() => handleDelete(c.id)}
-                className="text-xs text-slate-500 hover:text-red-400"
+                aria-label="Delete comment"
+                title="Delete comment"
+                className="rounded p-1 text-slate-500 hover:text-red-400"
               >
-                Delete
+                <Trash2 size={14} aria-hidden="true" />
               </button>
             )}
           </div>

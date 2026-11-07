@@ -1,24 +1,21 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Check, Heart, MessageSquare, Share2, Trash2 } from "lucide-react";
 import api, { errorMessage } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { timeAgo } from "../utils/time";
-import CommentSection from "./CommentSection";
-import { Link } from "react-router-dom";
 import Avatar from "./Avatar";
 import PostContent from "./PostContent";
+import CommentSection from "./CommentSection";
 
-export default function PostCard({
-  post,
-  onDelete,
-  defaultOpenComments = false,
-}) {
+export default function PostCard({ post, onDelete, defaultOpenComments = false }) {
   const { user } = useAuth();
   const [liked, setLiked] = useState(post.likedByMe);
   const [likes, setLikes] = useState(post._count.likes);
   const [busy, setBusy] = useState(false);
   const [showComments, setShowComments] = useState(defaultOpenComments);
-  const [copied, setCopied] = useState(false);
   const [commentCount, setCommentCount] = useState(post._count.comments);
+  const [copied, setCopied] = useState(false);
   const isOwner = user.id === post.author.id;
 
   const toggleLike = async () => {
@@ -63,14 +60,14 @@ export default function PostCard({
     }
   };
 
+  const action = "inline-flex items-center gap-1.5 rounded p-1 -m-1 hover:text-white";
+
   return (
-    <article className="rounded-xl border border-white/10 bg-white/3 p-4">
+    <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
       <header className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/30 text-sm font-semibold uppercase text-white">
-            <Avatar user={post.author} size="sm" />
-          </div>
-          <div className="text-sm">
+        <div className="flex min-w-0 items-center gap-2">
+          <Avatar user={post.author} size="sm" />
+          <div className="min-w-0 text-sm">
             <Link
               to={`/u/${post.author.username}`}
               className="font-medium text-white hover:underline"
@@ -85,9 +82,11 @@ export default function PostCard({
         {isOwner && (
           <button
             onClick={handleDelete}
-            className="text-xs text-slate-500 hover:text-red-400"
+            aria-label="Delete post"
+            title="Delete post"
+            className="rounded p-1 text-slate-500 hover:text-red-400"
           >
-            Delete
+            <Trash2 size={16} aria-hidden="true" />
           </button>
         )}
       </header>
@@ -97,18 +96,29 @@ export default function PostCard({
       <footer className="mt-3 flex gap-6 text-sm text-slate-400">
         <button
           onClick={toggleLike}
-          className={liked ? "text-pink-400" : "hover:text-white"}
+          aria-pressed={liked}
+          aria-label={liked ? "Unlike" : "Like"}
+          className={`${action} ${liked ? "text-pink-400" : ""}`}
         >
-          {liked ? "♥" : "♡"} {likes}
+          <Heart size={16} aria-hidden="true" className={liked ? "fill-current" : ""} />
+          {likes}
         </button>
         <button
           onClick={() => setShowComments((v) => !v)}
-          className={showComments ? "text-white" : "hover:text-white"}
+          aria-expanded={showComments}
+          aria-label="Comments"
+          className={`${action} ${showComments ? "text-white" : ""}`}
         >
-          💬 {commentCount}
+          <MessageSquare size={16} aria-hidden="true" />
+          {commentCount}
         </button>
-        <button onClick={share} className="hover:text-white">
-          {copied ? "✓ copied" : "↗ share"}
+        <button onClick={share} aria-label="Copy link to post" className={action}>
+          {copied ? (
+            <Check size={16} aria-hidden="true" className="text-accent-400" />
+          ) : (
+            <Share2 size={16} aria-hidden="true" />
+          )}
+          {copied ? "copied" : "share"}
         </button>
       </footer>
 

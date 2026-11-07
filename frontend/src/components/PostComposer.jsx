@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api, { errorMessage } from "../services/api";
+import { Code } from "lucide-react";
 
 export default function PostComposer({ onCreated }) {
   const [content, setContent] = useState("");
@@ -44,9 +45,10 @@ export default function PostComposer({ onCreated }) {
           <button
             type="button"
             onClick={insertCode}
-            className="rounded border border-white/10 px-2 py-1 text-xs text-slate-300 hover:bg-white/5"
+            className="inline-flex items-center gap-1 rounded border border-white/10 px-2 py-1 text-xs text-slate-300 hover:bg-white/5"
           >
-            {"</> code"}
+            <Code size={14} aria-hidden="true" />
+            code
           </button>
           <span className="text-xs text-slate-500">{content.length}/1000</span>
         </div>
