@@ -33,7 +33,7 @@ export default function AppLayout() {
       {/* desktop sidebar */}
       <aside className="hidden w-56 shrink-0 flex-col border-r border-white/10 p-4 md:sticky md:top-0 md:flex md:h-screen">
         <h1 className="mb-6 text-lg font-bold text-white">
-          <span className="text-accent-400">$</span> <span className="cursor">devconnect</span>
+          <span className="text-accent-400">$</span> <span className="cursor">DevConnect</span>
         </h1>
         <nav className="flex-1 space-y-1">
           {items.map(({ to, label, icon: Icon }) => (
@@ -60,7 +60,7 @@ export default function AppLayout() {
         {/* mobile top bar */}
         <header className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
           <h1 className="font-bold text-white">
-            <span className="text-accent-400">$</span> <span className="cursor">devconnect</span>
+            <span className="text-accent-400">$</span> <span className="cursor">DevConnect</span>
           </h1>
           <div className="flex items-center gap-3">
             <ThemeToggle />

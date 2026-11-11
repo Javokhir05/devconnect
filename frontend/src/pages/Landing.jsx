@@ -3,7 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "../components/ThemeToggle";
 
-const CMD = "devconnect --join";
+const CMD = "DevConnect --join";
 const OUTPUT = [
   "✔ share projects and posts",
   "✔ follow developers, find people by skill",
@@ -61,7 +61,7 @@ function TerminalCard() {
           <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-accent-500/70" />
-          <span className="ml-3 text-xs text-slate-500">~/devconnect</span>
+          <span className="ml-3 text-xs text-slate-500">~/DevConnect</span>
         </div>
         <div aria-hidden="true" className="min-h-[11rem] space-y-1 overflow-x-auto p-4 text-sm">
           <div className="text-slate-200">
@@ -111,7 +111,7 @@ export default function Landing() {
     <div className="relative min-h-screen overflow-x-hidden bg-base text-slate-200">
       <header className="relative z-10 mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <span className="font-bold text-white">
-          <span className="text-accent-400">$</span> <span className="cursor">devconnect</span>
+          <span className="text-accent-400">$</span> <span className="cursor">DevConnect</span>
         </span>
         <nav className="flex items-center gap-4 text-sm">
           <a href="#features" className="hidden text-slate-400 hover:text-white sm:inline">
@@ -234,7 +234,10 @@ export default function Landing() {
       </main>
 
       <footer className="relative z-10 border-t border-white/10 py-6 text-center text-xs text-slate-500">
-        built with React, Node.js, PostgreSQL and Prisma
+        <div className ="footer-content">
+          <h2 className="footer-heading">DevConnect</h2>
+          <p>© 2026 Javokhir Ruziboev — Built with passion</p>
+        </div>
       </footer>
     </div>
   );

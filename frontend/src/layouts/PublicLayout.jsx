@@ -16,7 +16,7 @@ export default function PublicLayout() {
         <div aria-hidden="true" className="hero-glow pointer-events-none absolute inset-0" />
 
         <Link to="/" className="relative text-lg font-bold text-white">
-          <span className="text-accent-400">$</span> <span className="cursor">devconnect</span>
+          <span className="text-accent-400">$</span> <span className="cursor">DevConnect</span>
         </Link>
 
         <div className="relative">
@@ -41,9 +41,9 @@ export default function PublicLayout() {
           </div>
         </div>
 
-        <p className="relative text-xs text-slate-500">
+        {/* <p className="relative text-xs text-slate-500">
           built with React, Node.js, PostgreSQL and Prisma
-        </p>
+        </p> */}
       </aside>
 
       {/* form side */}
@@ -60,7 +60,7 @@ export default function PublicLayout() {
               to="/"
               className="mb-6 block text-center text-2xl font-bold text-white md:hidden"
             >
-              <span className="text-accent-400">$</span> <span className="cursor">devconnect</span>
+              <span className="text-accent-400">$</span> <span className="cursor">DevConnect</span>
             </Link>
             <Outlet />
           </div>
