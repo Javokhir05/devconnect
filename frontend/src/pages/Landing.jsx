@@ -173,7 +173,7 @@ export default function Landing() {
         </section>
 
         {/* stack strip */}
-        <section className="pb-12">
+        {/* <section className="pb-12">
           <p className="mb-3 text-xs text-slate-500">{"// built with"}</p>
           <ul className="flex flex-wrap gap-2">
             {stack.map((s) => (
@@ -185,7 +185,7 @@ export default function Landing() {
               </li>
             ))}
           </ul>
-        </section>
+        </section> */}
 
         {/* features */}
         <section id="features" className="scroll-mt-6 pb-16">
