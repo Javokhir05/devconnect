@@ -6,6 +6,9 @@ import postRoutes from "./routes/posts.routes.js";
 import commentRoutes from "./routes/comments.routes.js";
 import userRoutes from "./routes/users.routes.js";
 import skillRoutes from "./routes/skills.routes.js";
+import http from "node:http";
+import chatRoutes from "./routes/chat.routes.js";
+import { initSocket } from "./socket.js";
 
 const app = express();
 
@@ -18,6 +21,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/skills", skillRoutes);
+app.use("/api/conversations", chatRoutes);
 
 
 app.use((req, res) => res.status(404).json({ error: "Route not found" }));
@@ -31,4 +35,6 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`API running on port ${PORT}`));
+const server = http.createServer(app);
+initSocket(server);
+server.listen(PORT, () => console.log(`API running on port ${PORT}`));
