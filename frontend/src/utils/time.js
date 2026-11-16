@@ -9,3 +9,11 @@ export function timeAgo(date) {
   if (d < 7) return `${d}d ago`;
   return new Date(date).toLocaleDateString();
 }
+
+export function messageTime(date) {
+  const d = new Date(date);
+  const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return d.toDateString() === new Date().toDateString()
+    ? time
+    : `${d.toLocaleDateString([], { month: "short", day: "numeric" })}, ${time}`;
+}

@@ -9,6 +9,7 @@ import Feed from "./pages/Feed";
 import Explore from "./pages/Explore";
 import Profile from "./pages/Profile";
 import PostPage from "./pages/PostPage";
+import Messages from "./pages/Messages";
 
 export default function App() {
   return (
@@ -24,6 +25,8 @@ export default function App() {
           <Route path="/explore" element={<Explore />} />
           <Route path="/u/:username" element={<Profile />} />
           <Route path="/post/:id" element={<PostPage />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/messages/:id" element={<Messages />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

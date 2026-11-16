@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import api, { errorMessage } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import SkillTags from "../components/SkillTags";
 import Avatar from "../components/Avatar";
 import { field } from "../utils/ui";
+import { MessageSquare } from "lucide-react";
+import { useChat } from "../context/ChatContext";
 
 const TABS = ["posts", "about", "skills"];
 
@@ -30,7 +32,10 @@ function EditForm({ profile, onSaved, onCancel }) {
     setError("");
     setSaving(true);
     try {
-      const skills = form.skills.split(",").map((s) => s.trim()).filter(Boolean);
+      const skills = form.skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
       const [p, s] = await Promise.all([
         api.patch("/users/me", {
           name: form.name,
@@ -56,22 +61,79 @@ function EditForm({ profile, onSaved, onCancel }) {
     >
       <h3 className="text-sm text-accent-400">$ edit-profile</h3>
       {error && (
-        <p role="alert" className="rounded-lg bg-red-500/10 p-2 text-sm text-red-400">
+        <p
+          role="alert"
+          className="rounded-lg bg-red-500/10 p-2 text-sm text-red-400"
+        >
           {error}
         </p>
       )}
-      <input className={field} aria-label="Name" placeholder="Name" maxLength={60} value={form.name} onChange={update("name")} />
-      <input className={field} aria-label="Headline" placeholder="Headline (e.g. Frontend Developer)" maxLength={60} value={form.headline} onChange={update("headline")} />
-      <textarea className={field} aria-label="Bio" rows={3} placeholder="Bio" maxLength={300} value={form.bio} onChange={update("bio")} />
-      <input className={field} aria-label="Location" placeholder="Location" maxLength={60} value={form.location} onChange={update("location")} />
-      <input className={field} aria-label="Skills" placeholder="Skills, separated by commas (React, Node.js, SQL)" value={form.skills} onChange={update("skills")} />
-      <input className={field} aria-label="GitHub URL" placeholder="GitHub URL (https://...)" value={form.githubUrl} onChange={update("githubUrl")} />
-      <input className={field} aria-label="Portfolio URL" placeholder="Portfolio URL (https://...)" value={form.portfolioUrl} onChange={update("portfolioUrl")} />
+      <input
+        className={field}
+        aria-label="Name"
+        placeholder="Name"
+        maxLength={60}
+        value={form.name}
+        onChange={update("name")}
+      />
+      <input
+        className={field}
+        aria-label="Headline"
+        placeholder="Headline (e.g. Frontend Developer)"
+        maxLength={60}
+        value={form.headline}
+        onChange={update("headline")}
+      />
+      <textarea
+        className={field}
+        aria-label="Bio"
+        rows={3}
+        placeholder="Bio"
+        maxLength={300}
+        value={form.bio}
+        onChange={update("bio")}
+      />
+      <input
+        className={field}
+        aria-label="Location"
+        placeholder="Location"
+        maxLength={60}
+        value={form.location}
+        onChange={update("location")}
+      />
+      <input
+        className={field}
+        aria-label="Skills"
+        placeholder="Skills, separated by commas (React, Node.js, SQL)"
+        value={form.skills}
+        onChange={update("skills")}
+      />
+      <input
+        className={field}
+        aria-label="GitHub URL"
+        placeholder="GitHub URL (https://...)"
+        value={form.githubUrl}
+        onChange={update("githubUrl")}
+      />
+      <input
+        className={field}
+        aria-label="Portfolio URL"
+        placeholder="Portfolio URL (https://...)"
+        value={form.portfolioUrl}
+        onChange={update("portfolioUrl")}
+      />
       <div className="flex gap-2">
-        <button disabled={saving} className="rounded-lg bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-400 disabled:opacity-50">
+        <button
+          disabled={saving}
+          className="rounded-lg bg-accent-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-400 disabled:opacity-50"
+        >
           {saving ? "Saving..." : "Save"}
         </button>
-        <button type="button" onClick={onCancel} className="rounded-lg border border-white/10 px-4 py-1.5 text-sm text-slate-300 hover:bg-white/5">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-lg border border-white/10 px-4 py-1.5 text-sm text-slate-300 hover:bg-white/5"
+        >
           Cancel
         </button>
       </div>
@@ -93,16 +155,31 @@ export default function Profile() {
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
+  // chat
+  const navigate = useNavigate();
+  const { startChat } = useChat();
+
+  const openChat = async () => {
+    try {
+      navigate(`/messages/${await startChat(username)}`);
+    } catch (err) {
+      setError(errorMessage(err));
+    }
+  };
 
   const tab = TABS.includes(params.get("tab")) ? params.get("tab") : "posts";
-  const selectTab = (t) => setParams(t === "posts" ? {} : { tab: t }, { replace: true });
+  const selectTab = (t) =>
+    setParams(t === "posts" ? {} : { tab: t }, { replace: true });
 
   useEffect(() => {
     setLoading(true);
     setNotFound(false);
     setError("");
     setEditing(false);
-    Promise.all([api.get(`/users/${username}`), api.get(`/users/${username}/posts`)])
+    Promise.all([
+      api.get(`/users/${username}`),
+      api.get(`/users/${username}/posts`),
+    ])
       .then(([p, ps]) => {
         setProfile(p.data.user);
         setIsFollowing(p.data.isFollowing);
@@ -124,7 +201,10 @@ export default function Profile() {
         ? await api.delete(`/users/${username}/follow`)
         : await api.put(`/users/${username}/follow`);
       setIsFollowing(res.data.following);
-      setProfile((p) => ({ ...p, _count: { ...p._count, followers: res.data.followers } }));
+      setProfile((p) => ({
+        ...p,
+        _count: { ...p._count, followers: res.data.followers },
+      }));
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -135,7 +215,9 @@ export default function Profile() {
   const loadMore = async () => {
     setLoadingMore(true);
     try {
-      const res = await api.get(`/users/${username}/posts`, { params: { cursor: nextCursor } });
+      const res = await api.get(`/users/${username}/posts`, {
+        params: { cursor: nextCursor },
+      });
       setPosts((prev) => [...prev, ...res.data.posts]);
       setNextCursor(res.data.nextCursor);
     } catch (err) {
@@ -167,11 +249,15 @@ export default function Profile() {
   ];
   const card = "rounded-xl border border-white/10 bg-white/[0.03]";
 
+
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       {/* header */}
       <section className={`${card} overflow-hidden`}>
-        <div aria-hidden="true" className="relative h-24 border-b border-white/10 sm:h-32">
+        <div
+          aria-hidden="true"
+          className="relative h-24 border-b border-white/10 sm:h-32"
+        >
           <div className="grid-bg absolute inset-0" />
           <div className="hero-glow absolute inset-0" />
           <span className="absolute bottom-2 right-3 text-xs text-slate-500">
@@ -184,7 +270,7 @@ export default function Profile() {
             <div className="rounded-full bg-base p-1">
               <Avatar user={profile} size="lg" />
             </div>
-            <div className="pb-1">
+            <div className="flex gap-2pb-1">
               {isMe ? (
                 !editing && (
                   <button
@@ -195,17 +281,27 @@ export default function Profile() {
                   </button>
                 )
               ) : (
-                <button
-                  onClick={toggleFollow}
-                  disabled={busy}
-                  className={`rounded-lg px-4 py-1.5 text-sm font-medium disabled:opacity-50 ${
-                    isFollowing
-                      ? "border border-white/10 text-slate-200 hover:bg-white/5"
-                      : "bg-accent-500 text-white hover:bg-accent-400"
-                  }`}
-                >
-                  {isFollowing ? "Following" : "Follow"}
-                </button>
+                <>
+                  <button
+                    onClick={openChat}
+                    aria-label="Send message"
+                    title="Send message"
+                    className="rounded-lg border border-white/10 p-2 text-slate-200 hover:bg-white/5"
+                  >
+                    <MessageSquare size={16} aria-hidden="true" />
+                  </button>
+                  <button
+                    onClick={toggleFollow}
+                    disabled={busy}
+                    className={`rounded-lg px-4 py-1.5 text-sm font-medium disabled:opacity-50 ${
+                      isFollowing
+                        ? "border border-white/10 text-slate-200 hover:bg-white/5"
+                        : "bg-accent-500 text-white hover:bg-accent-400"
+                    }`}
+                  >
+                    {isFollowing ? "Following" : "Follow"}
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -214,7 +310,9 @@ export default function Profile() {
             {profile.name || profile.username}
           </h2>
           <p className="text-sm text-slate-500">@{profile.username}</p>
-          {profile.headline && <p className="mt-1 text-sm text-accent-400">{profile.headline}</p>}
+          {profile.headline && (
+            <p className="mt-1 text-sm text-accent-400">{profile.headline}</p>
+          )}
           {profile.bio && (
             <p className="mt-3 line-clamp-2 whitespace-pre-wrap break-words text-sm text-slate-300">
               {profile.bio}
@@ -233,17 +331,28 @@ export default function Profile() {
       </section>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-500/10 p-2 text-sm text-red-400">
+        <p
+          role="alert"
+          className="rounded-lg bg-red-500/10 p-2 text-sm text-red-400"
+        >
           {error}
         </p>
       )}
 
       {editing ? (
-        <EditForm profile={profile} onSaved={handleSaved} onCancel={() => setEditing(false)} />
+        <EditForm
+          profile={profile}
+          onSaved={handleSaved}
+          onCancel={() => setEditing(false)}
+        />
       ) : (
         <>
           {/* tabs */}
-          <div role="tablist" aria-label="Profile sections" className="flex gap-1 border-b border-white/10">
+          <div
+            role="tablist"
+            aria-label="Profile sections"
+            className="flex gap-1 border-b border-white/10"
+          >
             {TABS.map((t) => (
               <button
                 key={t}
@@ -260,16 +369,25 @@ export default function Profile() {
               >
                 {t}
                 {t === "posts" && (
-                  <span className="ml-1.5 text-xs text-slate-500">{profile._count.posts}</span>
+                  <span className="ml-1.5 text-xs text-slate-500">
+                    {profile._count.posts}
+                  </span>
                 )}
               </button>
             ))}
           </div>
 
-          <div role="tabpanel" id="tabpanel" aria-labelledby={`tab-${tab}`} className="space-y-4">
+          <div
+            role="tabpanel"
+            id="tabpanel"
+            aria-labelledby={`tab-${tab}`}
+            className="space-y-4"
+          >
             {tab === "posts" && (
               <>
-                {posts.length === 0 && <p className="text-slate-400">No posts yet.</p>}
+                {posts.length === 0 && (
+                  <p className="text-slate-400">No posts yet.</p>
+                )}
                 {posts.map((post) => (
                   <PostCard
                     key={post.id}
@@ -298,17 +416,26 @@ export default function Profile() {
             {tab === "about" && (
               <div className={`${card} space-y-4 p-5 text-sm`}>
                 <p className="whitespace-pre-wrap break-words text-slate-300">
-                  {profile.bio || <span className="text-slate-500">No bio yet.</span>}
+                  {profile.bio || (
+                    <span className="text-slate-500">No bio yet.</span>
+                  )}
                 </p>
                 <dl className="grid grid-cols-[7rem_minmax(0,1fr)] gap-x-3 gap-y-2">
                   <dt className="text-slate-500">location</dt>
-                  <dd className="break-words text-slate-300">{profile.location || "—"}</dd>
+                  <dd className="break-words text-slate-300">
+                    {profile.location || "—"}
+                  </dd>
                   <dt className="text-slate-500">joined</dt>
                   <dd className="text-slate-300">{joined}</dd>
                   <dt className="text-slate-500">github</dt>
                   <dd>
                     {profile.githubUrl ? (
-                      <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="break-all text-accent-400 hover:underline">
+                      <a
+                        href={profile.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="break-all text-accent-400 hover:underline"
+                      >
                         {cleanUrl(profile.githubUrl)}
                       </a>
                     ) : (
@@ -318,7 +445,12 @@ export default function Profile() {
                   <dt className="text-slate-500">portfolio</dt>
                   <dd>
                     {profile.portfolioUrl ? (
-                      <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="break-all text-accent-400 hover:underline">
+                      <a
+                        href={profile.portfolioUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="break-all text-accent-400 hover:underline"
+                      >
                         {cleanUrl(profile.portfolioUrl)}
                       </a>
                     ) : (
@@ -337,7 +469,10 @@ export default function Profile() {
                   <p className="text-sm text-slate-400">
                     No skills added yet.{" "}
                     {isMe && (
-                      <button onClick={() => setEditing(true)} className="text-accent-400 hover:underline">
+                      <button
+                        onClick={() => setEditing(true)}
+                        className="text-accent-400 hover:underline"
+                      >
                         Add some
                       </button>
                     )}

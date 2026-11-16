@@ -1,11 +1,13 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Compass, House, LogOut, User } from "lucide-react";
+import { Compass, House, LogOut, User, Mail } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "../components/ThemeToggle";
+import { useChat } from "../context/ChatContext";
 
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { unreadTotal } = useChat();
 
   const handleLogout = () => {
     logout();
@@ -15,12 +17,15 @@ export default function AppLayout() {
   const items = [
     { to: "/feed", label: "feed", icon: House },
     { to: "/explore", label: "explore", icon: Compass },
+    { to: "/messages", label: "messages", icon: Mail },
     { to: `/u/${user.username}`, label: "profile", icon: User },
   ];
 
   const sideLink = ({ isActive }) =>
     `flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
-      isActive ? "bg-accent-500/15 text-accent-400" : "text-slate-400 hover:text-white"
+      isActive
+        ? "bg-accent-500/15 text-accent-400"
+        : "text-slate-400 hover:text-white"
     }`;
 
   const tabLink = ({ isActive }) =>
@@ -33,13 +38,19 @@ export default function AppLayout() {
       {/* desktop sidebar */}
       <aside className="hidden w-56 shrink-0 flex-col border-r border-white/10 p-4 md:sticky md:top-0 md:flex md:h-screen">
         <h1 className="mb-6 text-lg font-bold text-white">
-          <span className="text-accent-400">$</span> <span className="cursor">DevConnect</span>
+          <span className="text-accent-400">$</span>{" "}
+          <span className="cursor">DevConnect</span>
         </h1>
         <nav className="flex-1 space-y-1">
           {items.map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} className={sideLink}>
               <Icon size={16} aria-hidden="true" />
               {label}
+              {label === "messages" && unreadTotal > 0 && (
+                <span className="ml-auto rounded bg-accent-500 px-1.5 text-xs font-medium text-white">
+                  {unreadTotal > 99 ? "99+" : unreadTotal}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -60,7 +71,8 @@ export default function AppLayout() {
         {/* mobile top bar */}
         <header className="flex items-center justify-between border-b border-white/10 px-4 py-3 md:hidden">
           <h1 className="font-bold text-white">
-            <span className="text-accent-400">$</span> <span className="cursor">DevConnect</span>
+            <span className="text-accent-400">$</span>{" "}
+            <span className="cursor">DevConnect</span>
           </h1>
           <div className="flex items-center gap-3">
             <ThemeToggle />
@@ -84,7 +96,14 @@ export default function AppLayout() {
       <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-white/10 bg-base pb-[env(safe-area-inset-bottom)] md:hidden">
         {items.map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} className={tabLink}>
-            <Icon size={20} aria-hidden="true" />
+            <span className="relative">
+              <Icon size={20} aria-hidden="true" />
+              {label === "messages" && unreadTotal > 0 && (
+                <span className="absolute -right-2 -top-1.5 rounded bg-accent-500 px-1 text-[10px] font-medium leading-4 text-white">
+                  {unreadTotal > 99 ? "99+" : unreadTotal}
+                </span>
+              )}
+            </span>
             {label}
           </NavLink>
         ))}
